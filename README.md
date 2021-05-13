@@ -1,2 +1,2 @@
 # clamguard-watchdog
-libclamav wrapper in C++ for my personal use. 
+A libclamav wrapper in C++.
