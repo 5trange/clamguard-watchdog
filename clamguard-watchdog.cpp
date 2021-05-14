@@ -111,7 +111,7 @@ public:
         options.general |= CL_SCAN_GENERAL_HEURISTICS;
         try
         {
-            if ((ret = cl_scanfile(filename, &virname, NULL, engine, &options)) == CL_VIRUS) 
+            if ((ret = cl_scanfile(filename, &virname, NULL, engine, &options)) == CL_VIRUS)
             {
                 cout << "\n\nVirus detected: " << virname;
                 return 1;
@@ -149,7 +149,7 @@ int main()
     new_engine.load_database();
     new_engine.check_database();
     new_engine.compile_engine();
-    new_engine.scan_file("clam.exe");
+    new_engine.scan_file("D:/CodeSpace/clamguard-watchdog/x64/Debug/clam.exe");
     new_engine.destroy_engine();
     return 0;
 }
