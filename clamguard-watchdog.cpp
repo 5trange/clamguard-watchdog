@@ -21,6 +21,7 @@ public:
  
     int init_libclamav()
     {
+        cout << "Initializing libclamav...";
         if ((ret = cl_init(CL_INIT_DEFAULT)) != CL_SUCCESS)
         {
             cout << "\n\nError initializing libclamav! " << ret;
@@ -141,7 +142,6 @@ public:
 };
 int main()
 {
-    cout << "Initializing libclamav...";
     Engine new_engine;
     new_engine.init_libclamav();
     new_engine.create_engine();
