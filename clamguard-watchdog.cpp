@@ -3,7 +3,6 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <conio.h>
 
 #include <iostream>
 #include <string>
@@ -125,9 +124,10 @@ public:
     {
         int num_files = 0;
         int num_detection = 0;
-        memset(&options, 0, sizeof(struct cl_scan_options));
 
         // libclamav options
+        memset(&options, 0, sizeof(struct cl_scan_options));
+
         options.general = CL_SCAN_GENERAL_ALLMATCHES | CL_SCAN_GENERAL_HEURISTICS;
 
         options.parse = CL_SCAN_PARSE_ARCHIVE | CL_SCAN_PARSE_ELF | CL_SCAN_PARSE_PDF |
@@ -149,7 +149,7 @@ public:
         {
             if (s.st_mode & S_IFDIR)
             {
-                cout << filename << " is a directory." << endl;
+                cout << filename << " is a directory." << endl; // Note to self: Implement some sort of progress.
                 try
                 {
                     // https://docs.microsoft.com/en-us/cpp/standard-library/recursive-directory-iterator-class?view=msvc-160
@@ -165,7 +165,7 @@ public:
                         }
                         num_files++;
                     }
-                    cout << "\n\n------Scan Summary------" << endl;
+                    cout << "\n\n------Scan Summary------" << endl << endl;
                     cout << "Scanned files    : " << num_files << endl;
                     cout << "Total detections : " << num_detection << "\n\n";
                 }
@@ -183,8 +183,22 @@ public:
                     if ((ret = cl_scanfile(filename, &virname, NULL, engine, &options)) == CL_VIRUS)
                     {
                         cout << "Detected: " << virname << endl;
-                        return 1;
                     }
+                    cout << "\n\n------Scan Summary------" << endl << endl;
+                    cout << "File scanned  : " << filename << endl;
+                    if (ret == CL_VIRUS)
+                    {
+                        cout << "Status        : Infected" << endl;
+                    }
+                    else if (ret == CL_CLEAN)
+                    {
+                        cout << "Status        : Clean" << endl;
+                    }
+                    else
+                    {
+                        cout << "Status        : Unknown" << endl;
+                    }
+
                 }
                 catch (const char* e)
                 {
@@ -206,7 +220,7 @@ public:
     int destroy_engine()
     {
         cl_engine_free(engine);
-        cout << "Destroyed engine." << endl;
+        cout << "\n\nEngine destroyed." << endl;
         return 0;
     }
 };
@@ -215,11 +229,11 @@ int main()
     Engine new_engine;
     new_engine.init_libclamav();
     new_engine.create_engine();
-    new_engine.print_datadir();
+    // new_engine.print_datadir(); Print hardcoded database dir.
     new_engine.load_database();
     // new_engine.check_database(); Check database.
     new_engine.compile_engine();
-    new_engine.scan_file("D:/Programs");
+    new_engine.scan_file("D:\\Programs");
     new_engine.destroy_engine();
     return 0;
 }
