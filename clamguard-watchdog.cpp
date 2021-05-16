@@ -3,6 +3,7 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <conio.h>
 
 #include <iostream>
 #include <string>
@@ -122,6 +123,8 @@ public:
 
     int scan_file(const char* filename)
     {
+        int num_files = 0;
+        int num_detection = 0;
         memset(&options, 0, sizeof(struct cl_scan_options));
 
         // libclamav options
@@ -135,7 +138,6 @@ public:
         options.heuristic = CL_SCAN_GENERAL_HEURISTIC_PRECEDENCE |
             CL_SCAN_HEURISTIC_ENCRYPTED_ARCHIVE |
             CL_SCAN_HEURISTIC_ENCRYPTED_DOC | CL_SCAN_HEURISTIC_BROKEN |
-            CL_SCAN_HEURISTIC_EXCEEDS_MAX |
             CL_SCAN_HEURISTIC_PHISHING_SSL_MISMATCH |
             CL_SCAN_HEURISTIC_PHISHING_CLOAK | CL_SCAN_HEURISTIC_MACROS |
             CL_SCAN_HEURISTIC_PARTITION_INTXN | CL_SCAN_HEURISTIC_STRUCTURED |
@@ -159,8 +161,13 @@ public:
                         if ((ret = cl_scanfile(filename_p, &virname, NULL, engine, &options)) == CL_VIRUS)
                         {
                             cout << "Detected: " << virname << endl;
+                            num_detection++;
                         }
+                        num_files++;
                     }
+                    cout << "\n\n------Scan Summary------" << endl;
+                    cout << "Scanned files    : " << num_files << endl;
+                    cout << "Total detections : " << num_detection << "\n\n";
                 }
                 catch (const char* e)
                 {
@@ -171,10 +178,17 @@ public:
             {
                 cout << filename << " is a file." << endl;
                 cout << "Scanning " << filename << endl;
-                if ((ret = cl_scanfile(filename, &virname, NULL, engine, &options)) == CL_VIRUS)
+                try
                 {
-                    cout << "Detected: " << virname << endl;
-                    return 1;
+                    if ((ret = cl_scanfile(filename, &virname, NULL, engine, &options)) == CL_VIRUS)
+                    {
+                        cout << "Detected: " << virname << endl;
+                        return 1;
+                    }
+                }
+                catch (const char* e)
+                {
+                    cerr << e << endl;
                 }
             }
             else
